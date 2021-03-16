@@ -360,7 +360,6 @@ $(call Package/freeswitch/Default)
 	  +libstdcpp \
 	  +!BUSYBOX_DEFAULT_SU:shadow-utils \
 	  +!BUSYBOX_DEFAULT_SU:shadow-su \
-	  +@OPENSSL_WITH_DEPRECATED \
 	  +FS_WITH_FREETYPE:libfreetype \
 	  +FS_WITH_ODBC:unixodbc \
 	  +FS_WITH_PNG:libpng \
