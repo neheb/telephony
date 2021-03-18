@@ -1,0 +1,104 @@
+--- a/libs/iksemel/src/stream.c
++++ b/libs/iksemel/src/stream.c
+@@ -314,11 +314,13 @@ handshake (struct stream_data *data)
+ 	int ret;
+ 	int finished;
+ 
++#if 0	
+ 	SSL_library_init();
+ 	SSL_load_error_strings();
+-	
++#endif
++
+ 	if (data->flags & SF_SERVER) {
+-		data->ssl_ctx = SSL_CTX_new(TLSv1_server_method());
++		data->ssl_ctx = SSL_CTX_new(TLS_server_method());
+ 		if(!data->ssl_ctx) return IKS_NOMEM;
+ 
+ 		if (SSL_CTX_use_certificate_file(data->ssl_ctx, data->cert_file, SSL_FILETYPE_PEM) <= 0) {
+@@ -329,7 +331,7 @@ handshake (struct stream_data *data)
+ 		}
+ 		SSL_CTX_set_verify(data->ssl_ctx, SSL_VERIFY_NONE, NULL);
+ 	} else {
+-		data->ssl_ctx = SSL_CTX_new(TLSv1_method());
++		data->ssl_ctx = SSL_CTX_new(TLS_method());
+ 		if(!data->ssl_ctx) return IKS_NOMEM;
+ 	}
+ 	
+--- a/src/switch_core.c
++++ b/src/switch_core.c
+@@ -1943,7 +1943,6 @@ SWITCH_DECLARE(switch_status_t) switch_c
+ 		runtime.console = stdout;
+ 	}
+ 
+-	SSL_library_init();
+ 	switch_ssl_init_ssl_locks();
+ 	switch_curl_init();
+ 
+--- a/src/switch_core_cert.c
++++ b/src/switch_core_cert.c
+@@ -31,6 +31,8 @@
+ 
+ #include <switch.h>
+ #include <switch_ssl.h>
++#include <openssl/bn.h>
++#include <openssl/rsa.h>
+ 
+ static switch_mutex_t **ssl_mutexes;
+ static switch_memory_pool_t *ssl_pool = NULL;
+@@ -61,9 +63,9 @@ SWITCH_DECLARE(void) switch_ssl_init_ssl
+ 	int i, num;
+ 
+ 	if (ssl_count == 0) {
+-		num = CRYPTO_num_locks();
++		num = 1;
+ 
+-		ssl_mutexes = OPENSSL_malloc(CRYPTO_num_locks() * sizeof(switch_mutex_t*));
++		ssl_mutexes = OPENSSL_malloc(sizeof(switch_mutex_t*));
+ 		switch_assert(ssl_mutexes != NULL);
+ 
+ 		switch_core_new_memory_pool(&ssl_pool);
+@@ -87,8 +89,7 @@ SWITCH_DECLARE(void) switch_ssl_destroy_
+ 	int i;
+ 
+ 	if (ssl_count == 1) {
+-		CRYPTO_set_locking_callback(NULL);
+-		for (i = 0; i < CRYPTO_num_locks(); i++) {
++		for (i = 0; i < 1; i++) {
+ 			if (ssl_mutexes[i]) {
+ 				switch_mutex_destroy(ssl_mutexes[i]);
+ 			}
+@@ -312,10 +313,12 @@ SWITCH_DECLARE(int) switch_core_gen_cert
+ 	X509_free(x509);
+ 	EVP_PKEY_free(pkey);
+ 
++#if 0
+ #ifndef OPENSSL_NO_ENGINE
+ 	ENGINE_cleanup();
+ #endif
+ 	CRYPTO_cleanup_all_ex_data();
++#endif
+ 
+ 	//CRYPTO_mem_leaks(bio_err);
+ 	//BIO_free(bio_err);
+@@ -455,8 +458,8 @@ static int mkcert(X509 **x509p, EVP_PKEY
+ 
+ 	X509_set_version(x, 2);
+ 	ASN1_INTEGER_set(X509_get_serialNumber(x), serial);
+-	X509_gmtime_adj(X509_get_notBefore(x), -(long)60*60*24*7);
+-	X509_gmtime_adj(X509_get_notAfter(x), (long)60*60*24*days);
++	X509_gmtime_adj(X509_getm_notBefore(x), -(long)60*60*24*7);
++	X509_gmtime_adj(X509_getm_notAfter(x), (long)60*60*24*days);
+ 	X509_set_pubkey(x, pk);
+ 
+ 	name = X509_get_subject_name(x);
+--- a/src/switch_rtp.c
++++ b/src/switch_rtp.c
+@@ -48,6 +48,7 @@
+ #include <srtp_priv.h>
+ #include <switch_ssl.h>
+ #include <switch_jitterbuffer.h>
++#include <openssl/dh.h>
+ 
+ //#define DEBUG_TS_ROLLOVER
+ #ifdef DEBUG_TS_ROLLOVER
