@@ -649,7 +649,8 @@ CONFIGURE_VARS+= \
 
 # fs_cli
 CONFIGURE_VARS+= \
-	disable_cc=yes
+	disable_cc=yes \
+	ac_cv_lib_ssl_DTLSv1_method=yes
 
 # Regarding apr_cv_mutex_robust_shared=no see
 # http://www.openwall.com/lists/musl/2016/11/26/1
