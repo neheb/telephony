@@ -310,7 +310,6 @@ $(call Package/freeswitch/Default)
 	  +libstdcpp \
 	  +!BUSYBOX_DEFAULT_SU:shadow-utils \
 	  +!BUSYBOX_DEFAULT_SU:shadow-su \
-	  +@OPENSSL_WITH_DEPRECATED \
 	  +FS_WITH_FREETYPE:libfreetype \
 	  +FS_WITH_ODBC:unixodbc \
 	  +FS_WITH_PNG:libpng \
@@ -632,7 +631,8 @@ CONFIGURE_VARS+= \
 
 # fs_cli
 CONFIGURE_VARS+= \
-	disable_cc=yes
+	disable_cc=yes \
+	ac_cv_lib_ssl_DTLSv1_method=yes
 
 # Regarding apr_cv_mutex_robust_shared=no see
 # http://www.openwall.com/lists/musl/2016/11/26/1
