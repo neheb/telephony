@@ -43,7 +43,7 @@ $(call Package/$(PKG_NAME)/Default)
   SECTION:=libs
   CATEGORY:=Libraries
   TITLE:=GSM mobile phone access lib
-  DEPENDS:=+libstdcpp
+  DEPENDS:=+libstdcpp @BROKEN
 endef
 
 define Package/gsm-utils
@@ -51,7 +51,7 @@ $(call Package/$(PKG_NAME)/Default)
   SECTION:=utils
   CATEGORY:=Utilities
   TITLE:=GSM mobile phone access apps
-  DEPENDS:=+$(PKG_NAME)
+  DEPENDS:=+$(PKG_NAME) @BROKEN
 endef
 
 define Package/$(PKG_NAME)/description
