@@ -27,7 +27,7 @@
  	
 --- a/src/switch_core.c
 +++ b/src/switch_core.c
-@@ -1941,7 +1941,6 @@ SWITCH_DECLARE(switch_status_t) switch_c
+@@ -1943,7 +1943,6 @@ SWITCH_DECLARE(switch_status_t) switch_c
  		runtime.console = stdout;
  	}
  
@@ -81,9 +81,9 @@
  
  	//CRYPTO_mem_leaks(bio_err);
  	//BIO_free(bio_err);
-@@ -394,8 +397,8 @@ static int mkcert(X509 **x509p, EVP_PKEY
+@@ -455,8 +458,8 @@ static int mkcert(X509 **x509p, EVP_PKEY
  
- 	X509_set_version(x, 0);
+ 	X509_set_version(x, 2);
  	ASN1_INTEGER_set(X509_get_serialNumber(x), serial);
 -	X509_gmtime_adj(X509_get_notBefore(x), -(long)60*60*24*7);
 -	X509_gmtime_adj(X509_get_notAfter(x), (long)60*60*24*days);
@@ -101,4 +101,4 @@
 +#include <openssl/dh.h>
  
  //#define DEBUG_TS_ROLLOVER
- //#define TS_ROLLOVER_START 4294951295
+ #ifdef DEBUG_TS_ROLLOVER
