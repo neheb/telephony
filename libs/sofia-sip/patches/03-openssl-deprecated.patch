@@ -1,0 +1,71 @@
+--- a/libsofia-sip-ua/stun/stun.c
++++ b/libsofia-sip-ua/stun/stun.c
+@@ -1353,27 +1353,6 @@ int stun_tls_callback(su_root_magic_t *m
+     }
+ 
+     /* openssl initiation */
+-    SSLeay_add_ssl_algorithms();
+-    SSL_load_error_strings();
+-    ctx = SSL_CTX_new(TLSv1_client_method());
+-    self->sh_ctx = ctx;
+-
+-    if (ctx == NULL) {
+-      STUN_ERROR(errno, SSL_CTX_new);
+-      stun_free_buffer(&msg_req->enc_buf);
+-      return -1;
+-    }
+-
+-    if (SSL_CTX_set_cipher_list(ctx, "AES128-SHA") == 0) {
+-      STUN_ERROR(errno, SSL_CTX_set_cipher_list);
+-      stun_free_buffer(&msg_req->enc_buf);
+-      return -1;
+-    }
+-
+-    /* Start TLS negotiation */
+-    ssl = SSL_new(ctx);
+-    self->sh_ssl = ssl;
+-
+     if (SSL_set_fd(ssl, sd->sd_socket) == 0) {
+       STUN_ERROR(err, connect);
+       stun_free_buffer(&msg_req->enc_buf);
+--- a/libsofia-sip-ua/tport/tport_tls.c
++++ b/libsofia-sip-ua/tport/tport_tls.c
+@@ -44,6 +44,7 @@
+ 
+ #include <openssl/lhash.h>
+ #include <openssl/bn.h>
++#include <openssl/dh.h>
+ #include <openssl/x509.h>
+ #include <openssl/x509v3.h>
+ #include <openssl/ssl.h>
+@@ -95,8 +96,6 @@ static int tls_ex_data_idx = -1; /* see
+ static void
+ tls_init_once(void)
+ {
+-  SSL_library_init();
+-  SSL_load_error_strings();
+   tls_ex_data_idx = SSL_get_ex_new_index(0, "sofia-sip private data", NULL, NULL, NULL);
+ }
+ 
+--- a/libsofia-sip-ua/tport/ws.c
++++ b/libsofia-sip-ua/tport/ws.c
+@@ -35,7 +35,6 @@ static struct ws_globals_s ws_globals;
+ void init_ssl(void)
+ {
+ 	//	SSL_library_init();
+-	SSL_load_error_strings();
+ }
+ void deinit_ssl(void)
+ {
+@@ -101,11 +100,6 @@ static void pthreads_thread_id(CRYPTO_TH
+ 
+ 
+ void init_ssl(void) {
+-	SSL_library_init();
+-
+-
+-	OpenSSL_add_all_algorithms();   /* load & register cryptos */
+-	SSL_load_error_strings();     /* load all error messages */
+ 	ws_globals.ssl_method = SSLv23_server_method();   /* create server instance */
+ 	ws_globals.ssl_ctx = SSL_CTX_new(ws_globals.ssl_method);         /* create context */
+ 	assert(ws_globals.ssl_ctx);
